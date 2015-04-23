@@ -27,6 +27,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    #メソッドチェーン
     User.find(params[:id]).destroy
     flash[:success] = "User destroyed."
     redirect_to users_url
@@ -61,6 +62,7 @@ class UsersController < ApplicationController
     end
 
     def correct_user
+      #どのユーザなのか
       @user = User.find(params[:id])
       redirect_to(root_path) unless current_user?(@user)
     end
