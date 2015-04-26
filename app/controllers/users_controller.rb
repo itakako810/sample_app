@@ -9,6 +9,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   def new
@@ -27,10 +28,20 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    #演習9.6の内容
+    user = User.find(params[:id])
+    if current_user? user
+      redirect_to(root_path)
+    else
+      user.destroy
+      flash[:success] = "User destroyed."
+      redirect_to users_url
+    end
+
     #メソッドチェーン
-    User.find(params[:id]).destroy
-    flash[:success] = "User destroyed."
-    redirect_to users_url
+    #User.find(params[:id]).destroy
+    #flash[:success] = "User destroyed."
+    #redirect_to users_url
   end
 
   def edit
