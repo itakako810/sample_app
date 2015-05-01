@@ -5,7 +5,6 @@ describe "User pages" do
   subject { page }
 
   describe "index" do
-
     let(:user) { FactoryGirl.create(:user) }
     before(:each) do
           sign_in user
@@ -42,9 +41,7 @@ describe "User pages" do
 
         it { should have_link('delete', href: user_path(User.first)) }
         it "should be able to delete another user" do
-          expect do
-            click_link('delete', match: :first)
-          end.to change(User, :count).by(-1)
+          expect { click_link('delete') }.to change(User, :count).by(-1)
         end
         it { should_not have_link('delete', href: user_path(admin)) }
       end
@@ -67,6 +64,7 @@ describe "User pages" do
       it { should have_content(m2.content) }
       it { should have_content(user.microposts.count) }
     end
+
     describe "follow/unfollow buttons" do
       let(:other_user) { FactoryGirl.create(:user) }
       before { sign_in user }
@@ -126,7 +124,8 @@ describe "User pages" do
  end
 
 
-  describe "signup" do
+ describe "signup" do
+
    before { visit signup_path }
 
    let(:submit) { "Create my account" }
@@ -202,38 +201,37 @@ describe "User pages" do
         { user: { admin: true, password: user.password,
                   password_confirmation: user.password } }
       end
-      before do
-        sign_in user, no_capybara: true
-        patch user_path(user), params
-      end
+      before { patch user_path(user), params }
       specify { expect(user.reload).not_to be_admin }
     end
   end
+
+
   describe "following/followers" do
-   let(:user) { FactoryGirl.create(:user) }
-   let(:other_user) { FactoryGirl.create(:user) }
-   before { user.follow!(other_user) }
+    let(:user) { FactoryGirl.create(:user) }
+    let(:other_user) { FactoryGirl.create(:user) }
+    before { user.follow!(other_user) }
 
-   describe "followed users" do
-     before do
-       sign_in user
-       visit following_user_path(user)
-     end
+    describe "followed users" do
+      before do
+        sign_in user
+        visit following_user_path(user)
+      end
 
-     it { should have_title(full_title('Following')) }
-     it { should have_selector('h3', text: 'Following') }
-     it { should have_link(other_user.name, href: user_path(other_user)) }
-   end
+      it { should have_title(full_title('Following')) }
+      it { should have_selector('h3', text: 'Following') }
+      it { should have_link(other_user.name, href: user_path(other_user)) }
+    end
 
-   describe "followers" do
-     before do
-       sign_in other_user
-       visit followers_user_path(other_user)
-     end
+    describe "followers" do
+      before do
+        sign_in other_user
+        visit followers_user_path(other_user)
+      end
 
-     it { should have_title(full_title('Followers')) }
-     it { should have_selector('h3', text: 'Followers') }
-     it { should have_link(user.name, href: user_path(user)) }
-   end
- end
+      it { should have_title(full_title('Followers')) }
+      it { should have_selector('h3', text: 'Followers') }
+      it { should have_link(user.name, href: user_path(user)) }
+    end
+  end
 end
